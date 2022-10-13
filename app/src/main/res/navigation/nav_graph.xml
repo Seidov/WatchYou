@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/discoverFragment"
-        android:name="com.sultanseidov.watchyou.DiscoverFragment"
+        android:name="com.sultanseidov.watchyou.view.fragment.DiscoverFragment"
         android:label="DiscoverFragment" >
         <action
             android:id="@+id/action_discoverFragment_to_searchFragment"
@@ -17,10 +17,10 @@
     </fragment>
     <fragment
         android:id="@+id/searchFragment"
-        android:name="com.sultanseidov.watchyou.SearchFragment"
+        android:name="com.sultanseidov.watchyou.view.fragment.SearchFragment"
         android:label="SearchFragment" />
     <fragment
         android:id="@+id/libraryFragment"
-        android:name="com.sultanseidov.watchyou.LibraryFragment"
+        android:name="com.sultanseidov.watchyou.view.fragment.LibraryFragment"
         android:label="LibraryFragment" />
 </navigation>

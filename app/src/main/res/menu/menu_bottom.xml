@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/discoverFragment"
+        android:title="@string/discover"
+        android:contentDescription="@string/discover"
+        android:icon="@drawable/ic_baseline_line_weight_24"/>
+
+    <item
+        android:id="@+id/searchFragment"
+        android:title="@string/search"
+        android:contentDescription="@string/search"
+        android:icon="@drawable/ic_baseline_location_searching_24"/>
+
+    <item
+        android:id="@+id/libraryFragment"
+        android:title="@string/library"
+        android:contentDescription="@string/library"
+        android:icon="@drawable/ic_baseline_video_library_24"/>
+
+</menu>
