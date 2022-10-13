@@ -1,4 +1,4 @@
-package com.sultanseidov.watchyou.view.base
+package com.sultanseidov.watchyou
 
 import android.app.Application
 
