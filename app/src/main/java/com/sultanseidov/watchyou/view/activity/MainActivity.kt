@@ -10,18 +10,21 @@ import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import com.sultanseidov.watchyou.R
 import com.sultanseidov.watchyou.databinding.ActivityMainBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+private lateinit var binding: ActivityMainBinding
+
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var navController: NavController
-    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
 
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
+        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN)
 
         setContentView(binding.root)
 

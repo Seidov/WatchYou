@@ -7,4 +7,14 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+
+    <color name="avatar_stroke">#FF0000</color>
+    <color name="avatar_stroke_bottom">#992222</color>
+    <color name="avatar_stroke_inside">#000000</color>
+    <color name="avatar_small_stroke">#000000</color>
+    <color name="avatar_text">#FFFFFFFF</color>
+    <color name="avatar_ad_text">#03A9F4</color>
+    <color name="avatar_ad_bg">#DADADA</color>\
+
 </resources>
