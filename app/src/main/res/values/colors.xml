@@ -13,7 +13,7 @@
     <color name="avatar_stroke_bottom">#992222</color>
     <color name="avatar_stroke_inside">#000000</color>
     <color name="avatar_small_stroke">#000000</color>
-    <color name="avatar_text">#FFFFFFFF</color>
+    <color name="avatar_text">#00FFFFFF</color>
     <color name="avatar_ad_text">#03A9F4</color>
     <color name="avatar_ad_bg">#DADADA</color>\
 
