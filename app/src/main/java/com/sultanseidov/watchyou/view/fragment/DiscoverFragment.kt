@@ -1,7 +1,6 @@
 package com.sultanseidov.watchyou.view.fragment
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -11,24 +10,30 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.Navigation
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
-import com.sultanseidov.watchyou.App
 import com.sultanseidov.watchyou.R
+import com.sultanseidov.watchyou.data.entities.DiscoverType
 import com.sultanseidov.watchyou.data.entities.base.Status
 import com.sultanseidov.watchyou.databinding.FragmentDiscoverBinding
-import com.sultanseidov.watchyou.util.Util.IMAGE_URL
-import com.sultanseidov.watchyou.view.activity.TestActivity
+import com.sultanseidov.watchyou.view.activity.UpcomingDetailsActivity
+import com.sultanseidov.watchyou.view.adapter.HomeRecyclerAdapter
+import com.sultanseidov.watchyou.view.customview.ZoomOutViewPage.ZoomOutPageTransformer
 import com.sultanseidov.watchyou.view.viewmodel.MovieViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import es.anthorlop.stories.StoriesManager
-import es.anthorlop.stories.datatype.Avatar
-import es.anthorlop.stories.datatype.Scene
-import es.anthorlop.stories.datatype.Story
 import es.anthorlop.stories.interfaces.StoriesInterface
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class DiscoverFragment : Fragment(R.layout.fragment_discover) {
+
+    @Inject
+    lateinit var adapter: HomeRecyclerAdapter
+    @Inject
+    lateinit var storiesManager: StoriesManager
 
     private var _binding: FragmentDiscoverBinding? = null
     private val binding get() = _binding!!
@@ -48,17 +53,19 @@ class DiscoverFragment : Fragment(R.layout.fragment_discover) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //findNavController().navigate(R.id.action_discoverFragment_to_libraryFragment)
+        initStoryView()
 
-        StoriesManager.getInstance().set("http://lombrinus.com", 5, 5)
+        initHomeRecyclerview()
 
-
-
-        viewModel.fetchUpcomingMovies()
+        viewModel.fetchHomeList()
 
         subscribeToObservers()
 
-        StoriesManager.getInstance().setInterface(object : StoriesInterface {
+    }
+
+    private fun initStoryView() {
+        storiesManager.set("", 5, 5)
+        storiesManager.setInterface(object : StoriesInterface {
             override fun onShowMoreClicked(
                 activity: Activity, idStory: Int, nameStory: String, storyType: String,
                 idScene: Int, link: String
@@ -71,7 +78,7 @@ class DiscoverFragment : Fragment(R.layout.fragment_discover) {
                  */
 
 
-                val intent = Intent(requireActivity(), TestActivity::class.java)
+                val intent = Intent(requireActivity(), UpcomingDetailsActivity::class.java)
                 intent.putExtra("movieId", idStory.toString())
                 activity.startActivity(intent)
 
@@ -108,182 +115,36 @@ class DiscoverFragment : Fragment(R.layout.fragment_discover) {
             }
 
             override fun getViewPagerTransformer(): ViewPager2.PageTransformer {
-                return App.ZoomOutPageTransformer()
+                return ZoomOutPageTransformer()
             }
         })
-
-
     }
 
+    private fun initHomeRecyclerview() {
+        binding.rcvHomeList.adapter = adapter
+        binding.rcvHomeList.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        adapter.setOnItemClickListener { onClickText, discoverType ->
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+            when (discoverType) {
+                DiscoverType.MOVIES ->{
+                    val bundle = Bundle()
+                    bundle.putString("movieId", onClickText.toString())
+                    Navigation.findNavController(requireView()).navigate(R.id.action_discoverFragment_to_movieDetailsFragment,bundle)
+                }
 
-        if (requestCode == StoriesManager.UE_STORIES_ACTIVITY_REQUEST_CODE) {
-            val container = binding.storiesBarContainer
-            StoriesManager.Companion.getInstance().refreshBarView(container)
+                DiscoverType.SERIALS -> {
+                    val bundle = Bundle()
+                    bundle.putString("tvId", onClickText.toString())
+                    Navigation.findNavController(requireView()).navigate(R.id.action_discoverFragment_to_tvDetailsFragment,bundle)
+                }
 
+                else -> {}
+            }
         }
     }
 
     private fun subscribeToObservers() {
-
-        viewModel.upcomingMoviesList.observe(viewLifecycleOwner) { result ->
-
-            when (result.status) {
-                Status.SUCCESS -> {
-                    result.data?.results?.let { list ->
-                        Log.e("viewModel.upcomingMoviesList", "SUCCESS")
-                        //viewModel.insertMovie(it[0])
-                        val storyList: ArrayList<Story> = arrayListOf()
-                        val avatarList: ArrayList<Avatar> = arrayListOf()
-
-                        list.forEach { itemMovie ->
-                            val scenes: ArrayList<Scene> = arrayListOf(
-                                Scene(
-                                    itemMovie.id,
-                                    itemMovie.id,
-                                    IMAGE_URL + itemMovie.backdrop_path,
-                                    "http://lombrinus.com",
-                                    true
-                                ), Scene(
-                                    itemMovie.id + 1,
-                                    itemMovie.id + 1,
-                                    IMAGE_URL + itemMovie.poster_path,
-                                    "http://lombrinus.com",
-                                    true
-                                )
-
-                            )
-
-                            var avatar = Avatar(
-                                itemMovie.id,
-                                itemMovie.original_title,
-                                false,
-                                "Test",
-                                IMAGE_URL + itemMovie.poster_path,
-                                IMAGE_URL + itemMovie.poster_path
-                            )
-
-                            var story =
-                                Story(
-                                    0,
-                                    itemMovie.id,
-                                    itemMovie.original_title,
-                                    "Test",
-                                    IMAGE_URL + itemMovie.poster_path,
-                                    false, scenes
-                                )
-
-                            storyList.add(story)
-                            avatarList.add(avatar)
-                        }
-
-                        binding.storiesBarContainer.addView(
-                            StoriesManager.getInstance().getBarView(requireActivity(), avatarList, storyList)
-                            //StoriesManager.getInstance().getBarViewModePreview(requireActivity(), avatarList, storyList)
-                        )
-
-
-                    }
-                }
-
-                Status.ERROR -> {
-                    result.message?.let {
-                        Log.e("viewModel.upcomingMoviesList", "ERROR")
-                    }
-                }
-
-                Status.LOADING -> {
-                    Log.e("viewModel.upcomingMoviesList", "LOADING")
-                }
-            }
-        }
-        viewModel.popularMoviesList.observe(viewLifecycleOwner) { result ->
-            when (result.status) {
-                Status.SUCCESS -> {
-                    result.data?.results?.let {
-                        Log.e("viewModel.popularMoviesList", "SUCCESS")
-                    }
-                }
-
-                Status.ERROR -> {
-                    result.message?.let {
-                        Log.e("viewModel.popularMoviesList", "ERROR")
-                    }
-                }
-
-                Status.LOADING -> {
-                    Log.e("viewModel.popularMoviesList", "LOADING")
-                }
-            }
-        }
-        viewModel.topRatedMoviesList.observe(viewLifecycleOwner) { result ->
-            when (result.status) {
-                Status.SUCCESS -> {
-                    result.data?.results?.let {
-                        Log.e("viewModel.topRatedMoviesList", "SUCCESS")
-                    }
-                }
-
-                Status.ERROR -> {
-                    result.message?.let {
-                        Log.e("viewModel.topRatedMoviesList", "ERROR")
-
-                    }
-                }
-
-                Status.LOADING -> {
-                    Log.e("viewModel.topRatedMoviesList", "LOADING")
-
-                }
-            }
-        }
-
-        viewModel.popularTvShowsList.observe(viewLifecycleOwner) { result ->
-            when (result.status) {
-                Status.SUCCESS -> {
-                    result.data?.results?.let { list ->
-                        Log.e("viewModel.popularTvShowsList", "SUCCESS")
-
-                        if (!list.isNullOrEmpty()) {
-                            //viewModel.insertTvShow(list[0])
-
-                        }
-                    }
-                }
-
-                Status.ERROR -> {
-                    result.message?.let {
-                        Log.e("viewModel.popularTvShowsList", "ERROR")
-                    }
-                }
-
-                Status.LOADING -> {
-                    Log.e("viewModel.popularTvShowsList", "LOADING")
-                }
-            }
-        }
-        viewModel.topRatedTvShowsList.observe(viewLifecycleOwner) { result ->
-            when (result.status) {
-                Status.SUCCESS -> {
-                    result.data?.results?.let {
-                        Log.e("viewModel.topRatedTvShowsList", "SUCCESS")
-                    }
-                }
-
-                Status.ERROR -> {
-                    result.message?.let {
-                        Log.e("viewModel.topRatedTvShowsList", "ERROR")
-                    }
-                }
-
-                Status.LOADING -> {
-                    Log.e("viewModel.topRatedTvShowsList", "LOADING")
-                }
-            }
-        }
-
         viewModel.multiSearchResultList.observe(viewLifecycleOwner) { result ->
             when (result.status) {
                 Status.SUCCESS -> {
@@ -303,33 +164,29 @@ class DiscoverFragment : Fragment(R.layout.fragment_discover) {
                 }
             }
         }
-
-
-        viewModel.upcomingStoryList.observe(viewLifecycleOwner) { result ->
+        viewModel.homeListResultList.observe(viewLifecycleOwner) { result ->
             when (result.status) {
                 Status.SUCCESS -> {
-                    result.data?.let { model ->
-                        Log.e("viewModel.upcomingMoviesList", "SUCCESS")
-                        //viewModel.insertMovie(it[0])
-
-
+                    result.data?.let {
+                        Log.e("viewModel.homeListResultList", "SUCCESS")
+                        adapter.discoverHomeViews = it
                     }
                 }
 
                 Status.ERROR -> {
                     result.message?.let {
-                        Log.e("viewModel.upcomingMoviesList", "ERROR")
+                        Log.e("viewModel.homeListResultList", "ERROR")
                     }
                 }
 
                 Status.LOADING -> {
-                    Log.e("viewModel.upcomingMoviesList", "LOADING")
+                    Log.e("viewModel.homeListResultList", "LOADING")
                 }
             }
+
         }
 
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

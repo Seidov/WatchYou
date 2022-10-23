@@ -14,6 +14,12 @@
         <action
             android:id="@+id/action_discoverFragment_to_libraryFragment"
             app:destination="@id/libraryFragment" />
+        <action
+            android:id="@+id/action_discoverFragment_to_movieDetailsFragment"
+            app:destination="@id/movieDetailsFragment" />
+        <action
+            android:id="@+id/action_discoverFragment_to_tvDetailsFragment"
+            app:destination="@id/tvDetailsFragment" />
     </fragment>
     <fragment
         android:id="@+id/searchFragment"
@@ -23,4 +29,12 @@
         android:id="@+id/libraryFragment"
         android:name="com.sultanseidov.watchyou.view.fragment.LibraryFragment"
         android:label="LibraryFragment" />
+    <fragment
+        android:id="@+id/movieDetailsFragment"
+        android:name="com.sultanseidov.watchyou.view.fragment.MovieDetailsFragment"
+        android:label="MovieDetailsFragment" />
+    <fragment
+        android:id="@+id/tvDetailsFragment"
+        android:name="com.sultanseidov.watchyou.view.fragment.TvDetailsFragment"
+        android:label="TvDetailsFragment" />
 </navigation>

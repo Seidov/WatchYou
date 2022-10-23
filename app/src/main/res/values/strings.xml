@@ -4,4 +4,7 @@
     <string name="discover">Discover</string>
     <string name="search">Search</string>
     <string name="library">Library</string>
+
+    <string name="stories_show_more">Details</string>
+    <string name="provider_text"><![CDATA[<font color="#ffffff">by</font> <font color="#03DAC5">SS</font>]]></string>
 </resources>

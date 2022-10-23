@@ -5,6 +5,7 @@ import com.sultanseidov.watchyou.data.entities.responceModel.ResponseMultiSearch
 import com.sultanseidov.watchyou.util.Util.API_KEY
 import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ITMDBApi {
@@ -50,6 +51,20 @@ interface ITMDBApi {
         @Query("api_key") api_key:String=API_KEY,
         @Query("language") language:String="en-US"
     ):Response<ResponseMultiSearchModel>
+
+    @GET("tv/{tv_id}")
+    suspend fun getTvDetails(
+        @Path("tv_id") tv_id:String,
+        @Query("api_key") api_key:String=API_KEY,
+        @Query("language") language:String="en-US"
+    ):Response<ResponseTvDetailsModel>
+
+    @GET("movie/{id}")
+    suspend fun getMovieDetails(
+        @Path("id") id:String,
+        @Query("api_key") api_key:String=API_KEY,
+        @Query("language") language:String="en-US"
+    ):Response<ResponseMovieDetailsModel>
 
 
 

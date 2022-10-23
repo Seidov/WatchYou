@@ -2,11 +2,11 @@ package com.sultanseidov.watchyou.view.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.LiveData
-import es.anthorlop.stories.datatype.Story
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sultanseidov.watchyou.data.entities.UpcomingMovieStoryModel
+import com.sultanseidov.watchyou.data.entities.DiscoverType
+import com.sultanseidov.watchyou.data.entities.DiscoverViewsModel
 import com.sultanseidov.watchyou.data.entities.movie.MovieModel
 import com.sultanseidov.watchyou.data.entities.base.Resource
 import com.sultanseidov.watchyou.data.entities.base.Status
@@ -15,10 +15,7 @@ import com.sultanseidov.watchyou.data.entities.responceModel.*
 import com.sultanseidov.watchyou.data.entities.multisearch.Result
 import com.sultanseidov.watchyou.data.entities.tvshow.TvShowModel
 import com.sultanseidov.watchyou.data.repository.IMovieRepository
-import com.sultanseidov.watchyou.util.Util.IMAGE_URL
 import dagger.hilt.android.lifecycle.HiltViewModel
-import es.anthorlop.stories.datatype.Avatar
-import es.anthorlop.stories.datatype.Scene
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -54,7 +51,7 @@ class MovieViewModel @Inject constructor(
     val topRatedMoviesList: LiveData<Resource<ResponseTopRatedMovieModel>>
         get() = topRatedMovies
 
-    private val popularMovies = MutableLiveData<Resource<ResponsePopularMovieModel>>()
+    private var popularMovies = MutableLiveData<Resource<ResponsePopularMovieModel>>()
     val popularMoviesList: LiveData<Resource<ResponsePopularMovieModel>>
         get() = popularMovies
 
@@ -70,22 +67,58 @@ class MovieViewModel @Inject constructor(
     val multiSearchResultList: LiveData<Resource<MultiSearchResult>>
         get() = multiSearchResult
 
-    private val upcomingStory = MutableLiveData<Resource<UpcomingMovieStoryModel>>()
-    val upcomingStoryList: LiveData<Resource<UpcomingMovieStoryModel>>
-        get() = upcomingStory
+    private val homeListResult = MutableLiveData<Resource<ArrayList<DiscoverViewsModel>>>()
+    val homeListResultList: LiveData<Resource<ArrayList<DiscoverViewsModel>>>
+        get() = homeListResult
 
-    private var _upcomingMovieId = MutableLiveData<String>()
-    val upcomingMovieId: LiveData<String>
-        get() = _upcomingMovieId
+    private val movieDetails = MutableLiveData<Resource<ResponseMovieDetailsModel>>()
+    val movieDetailsData: LiveData<Resource<ResponseMovieDetailsModel>>
+        get() = movieDetails
 
-    fun setUpcomingMovieId(id:String){
-        _upcomingMovieId.value=id
+
+    private val tvDetails = MutableLiveData<Resource<ResponseTvDetailsModel>>()
+    val tvDetailsData: LiveData<Resource<ResponseTvDetailsModel>>
+        get() = tvDetails
+
+
+
+    fun fetchHomeList() {
+
+        homeListResult.value = Resource.loading(null)
+
+        viewModelScope.launch {
+
+            var homeList = arrayListOf<DiscoverViewsModel>(
+                DiscoverViewsModel(DiscoverType.STORY).apply {
+                    type = DiscoverType.STORY
+                    upcomingMoviesList = repository.getUpcomingMovies().data?.results!!
+                },
+                DiscoverViewsModel(DiscoverType.MOVIES).apply {
+                    type = DiscoverType.MOVIES
+                    popularMoviesList = repository.getPopularMovies().data?.results!!
+                },
+                DiscoverViewsModel(DiscoverType.MOVIES).apply {
+                    type = DiscoverType.MOVIES
+                    topRatedMoviesList = repository.getTopRatedMovies().data?.results!!
+                },
+                DiscoverViewsModel(DiscoverType.SERIALS).apply {
+                    type = DiscoverType.SERIALS
+                    popularTvShowsList = repository.getPopularTvShows().data?.results!!
+                },
+                DiscoverViewsModel(DiscoverType.SERIALS).apply {
+                    type = DiscoverType.SERIALS
+                    topRatedTvShowsList = repository.getTopRatedTvShows().data?.results!!
+                }
+            )
+
+            homeListResult.value=Resource(
+                status = Status.SUCCESS,
+                data = homeList,
+                message = "SUCCESS"
+            )
+        }
+
     }
-
-    fun getUpcomingMovieId():String{
-        return _upcomingMovieId.value.toString()
-    }
-
 
     fun fetchUpcomingMovies() {
         upcomingMovies.value = Resource.loading(null)
@@ -160,55 +193,22 @@ class MovieViewModel @Inject constructor(
         }
     }
 
-    fun getUpcomingMovieStories() {
-
-        val storyList: ArrayList<Story> = arrayListOf()
-        val avatarList:ArrayList<Avatar> = arrayListOf()
-
-        upcomingMovies.value?.data?.results?.forEach { itemMovie ->
-
-            val scenes: ArrayList<Scene> = arrayListOf(
-                Scene(
-                    itemMovie.id,
-                    itemMovie.id,
-                    itemMovie.backdrop_path,
-                    "http://lombrinus.com",
-                    true
-                ), Scene(
-                    itemMovie.id + 1,
-                    itemMovie.id + 1,
-                    itemMovie.poster_path,
-                    "http://lombrinus.com",
-                    true
-                )
-            )
-
-            var avatar = Avatar(
-                itemMovie.id,
-                "# S${itemMovie.original_title}",
-                false,
-                "Test",
-                IMAGE_URL + itemMovie.poster_path,
-                IMAGE_URL + itemMovie.poster_path
-            )
-
-            var story =
-                Story(
-                    0, itemMovie.id, "Story $itemMovie.id", "Test",
-                    "IMAGE_URL+itemMovie.poster_path",
-                    false, scenes
-                )
-
-            storyList.add(story)
-            avatarList.add(avatar)
-
+    fun fetchMovieDetails(id:String) {
+        movieDetails.value = Resource.loading(null)
+        viewModelScope.launch {
+            val response = repository.getMovieDetails(id)
+            movieDetails.value = response
         }
-
-        upcomingStory.value= Resource( status = Status.SUCCESS,
-            data =  UpcomingMovieStoryModel(storyList,avatarList),
-            message = "SUCCESS")
-
     }
+
+    fun fetchTvDetails(id:String) {
+        tvDetails.value = Resource.loading(null)
+        viewModelScope.launch {
+            val response = repository.getTvDetails(id)
+            tvDetails.value = response
+        }
+    }
+
 
     private fun List<Result>.convertResultToMovieModel(): List<MovieModel> {
         return this.map {
