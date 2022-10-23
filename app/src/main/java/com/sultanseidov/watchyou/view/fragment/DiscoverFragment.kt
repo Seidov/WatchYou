@@ -160,7 +160,7 @@ class DiscoverFragment : Fragment(R.layout.fragment_discover) {
                 }
 
                 Status.LOADING -> {
-                    Log.e("viewModel.topRatedTvShowsList", "TVSHOWS")
+                    Log.e("viewModel.topRatedTvShowsList", "LOADING")
                 }
             }
         }
@@ -180,7 +180,7 @@ class DiscoverFragment : Fragment(R.layout.fragment_discover) {
                 }
 
                 Status.LOADING -> {
-                    Log.e("viewModel.homeListResultList", "TVSHOWS")
+                    Log.e("viewModel.homeListResultList", "LOADING")
                 }
             }
 

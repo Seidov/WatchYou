@@ -71,6 +71,16 @@ class MovieViewModel @Inject constructor(
     val homeListResultList: LiveData<Resource<ArrayList<DiscoverViewsModel>>>
         get() = homeListResult
 
+    private val movieDetails = MutableLiveData<Resource<ResponseMovieDetailsModel>>()
+    val movieDetailsData: LiveData<Resource<ResponseMovieDetailsModel>>
+        get() = movieDetails
+
+
+    private val tvDetails = MutableLiveData<Resource<ResponseTvDetailsModel>>()
+    val tvDetailsData: LiveData<Resource<ResponseTvDetailsModel>>
+        get() = tvDetails
+
+
 
     fun fetchHomeList() {
 
@@ -180,6 +190,22 @@ class MovieViewModel @Inject constructor(
                 Log.e("fetchMultiSearch", "Data Null!")
 
             }
+        }
+    }
+
+    fun fetchMovieDetails(id:String) {
+        movieDetails.value = Resource.loading(null)
+        viewModelScope.launch {
+            val response = repository.getMovieDetails(id)
+            movieDetails.value = response
+        }
+    }
+
+    fun fetchTvDetails(id:String) {
+        tvDetails.value = Resource.loading(null)
+        viewModelScope.launch {
+            val response = repository.getTvDetails(id)
+            tvDetails.value = response
         }
     }
 

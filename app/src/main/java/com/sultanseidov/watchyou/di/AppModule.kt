@@ -14,6 +14,7 @@ import com.sultanseidov.watchyou.R
 import com.sultanseidov.watchyou.data.local.AppDatabase
 import com.sultanseidov.watchyou.data.local.MovieDao
 import com.sultanseidov.watchyou.data.local.TvShowDao
+import com.sultanseidov.watchyou.data.remote.ITMDBApi
 import com.sultanseidov.watchyou.data.repository.IMovieRepository
 import com.sultanseidov.watchyou.data.repository.MovieRepository
 import com.sultanseidov.watchyou.util.Util.BASE_URL
@@ -21,18 +22,14 @@ import com.sultanseidov.watchyou.view.customview.ZoomOutViewPage.ZoomOutPageTran
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import es.anthorlop.stories.StoriesManager
-import es.anthorlop.stories.datatype.Avatar
-import es.anthorlop.stories.datatype.Story
 import es.anthorlop.stories.interfaces.ImageLoaderInterface
 import es.anthorlop.stories.interfaces.StoriesInterface
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
-import com.sultanseidov.watchyou.data.remote.ITMDBApi as ITMDBApi1
 
 
 @Module
@@ -58,15 +55,15 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun injectRetrofitApi(): ITMDBApi1 {
+    fun injectRetrofitApi(): ITMDBApi {
         return Retrofit.Builder().addConverterFactory(GsonConverterFactory.create())
-            .baseUrl(BASE_URL).build().create(ITMDBApi1::class.java)
+            .baseUrl(BASE_URL).build().create(ITMDBApi::class.java)
     }
 
 
     @Singleton
     @Provides
-    fun injectNormalRepo(movieDao: MovieDao, tvShowDao: TvShowDao, api: ITMDBApi1) =
+    fun injectNormalRepo(movieDao: MovieDao, tvShowDao: TvShowDao, api: ITMDBApi) =
         MovieRepository(movieDao, tvShowDao, api) as IMovieRepository
 
 

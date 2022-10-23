@@ -33,4 +33,8 @@ interface IMovieRepository {
 
     suspend fun getMultiSearch(query:String): Resource<ResponseMultiSearchModel>
 
+    suspend fun getMovieDetails(id:String): Resource<ResponseMovieDetailsModel>
+
+    suspend fun getTvDetails(id:String): Resource<ResponseTvDetailsModel>
+
 }

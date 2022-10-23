@@ -130,4 +130,35 @@ class MovieRepository @Inject constructor(
             Resource.error("No Data!", null)
         }
     }
+
+    override suspend fun getMovieDetails(id:String): Resource<ResponseMovieDetailsModel> {
+        return try {
+            val response = retrofitApi.getMovieDetails(id)
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    return@let Resource.success(it)
+                } ?: Resource.error("Error", null)
+            } else {
+                Resource.error("Error", null)
+            }
+        } catch (e: Exception) {
+            Resource.error("No Data!", null)
+        }
+    }
+
+    override suspend fun getTvDetails(id:String): Resource<ResponseTvDetailsModel> {
+        return try {
+            val response = retrofitApi.getTvDetails(id)
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    return@let Resource.success(it)
+                } ?: Resource.error("Error", null)
+            } else {
+                Resource.error("Error", null)
+            }
+        } catch (e: Exception) {
+            Resource.error("No Data!", null)
+        }
+    }
+
 }
