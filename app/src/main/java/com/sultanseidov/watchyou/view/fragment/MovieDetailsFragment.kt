@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.Navigation
+import androidx.navigation.Navigation.findNavController
 import com.sultanseidov.watchyou.R
 import com.sultanseidov.watchyou.data.entities.base.Status
 import com.sultanseidov.watchyou.databinding.FragmentDiscoverBinding
@@ -18,10 +20,12 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details) {
 
+    private lateinit var arg: String
+
     private var _binding: FragmentMovieDetailsBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel by viewModels<MovieViewModel>()
+    //private val viewModel by viewModels<MovieViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,15 +38,30 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         var movieId = "null"
         movieId = arguments?.getString("movieId").toString()
 
-        if (movieId != "null") {
 
-            viewModel.fetchMovieDetails(movieId)
+        binding.gotoBaseDetails.setOnClickListener {
+            if (movieId != "null") {
 
-            subscribeToObservers()
+                //viewModel.fetchMovieDetails(movieId)
+                //subscribeToObservers()
+
+                val bundle = Bundle()
+                bundle.putString("contentId", movieId)
+                try {
+
+                    //findNavController(view).navigate(R.id.action_movieDetailsFragment_to_baseDetailsFragment,bundle)
+                }catch (e:Exception){
+                    Log.e("findNavController","error: "+e.toString())
+                }
+
+            }
         }
+
+
 
     }
 
@@ -52,6 +71,7 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details) {
     }
 
 
+    /*
     private fun subscribeToObservers() {
         viewModel.movieDetailsData.observe(viewLifecycleOwner) { result ->
             when (result.status) {
@@ -77,5 +97,7 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details) {
 
     }
 
+
+     */
 
 }

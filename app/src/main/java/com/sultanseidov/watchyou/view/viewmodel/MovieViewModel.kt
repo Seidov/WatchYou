@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sultanseidov.watchyou.data.entities.DiscoverType
 import com.sultanseidov.watchyou.data.entities.DiscoverViewsModel
+import com.sultanseidov.watchyou.data.entities.SelectedItemModel
 import com.sultanseidov.watchyou.data.entities.movie.MovieModel
 import com.sultanseidov.watchyou.data.entities.base.Resource
 import com.sultanseidov.watchyou.data.entities.base.Status
@@ -75,10 +76,29 @@ class MovieViewModel @Inject constructor(
     val movieDetailsData: LiveData<Resource<ResponseMovieDetailsModel>>
         get() = movieDetails
 
-
     private val tvDetails = MutableLiveData<Resource<ResponseTvDetailsModel>>()
     val tvDetailsData: LiveData<Resource<ResponseTvDetailsModel>>
         get() = tvDetails
+
+
+    private val selectedItemModel = MutableLiveData<Resource<SelectedItemModel>>()
+    val selectedItem: LiveData<Resource<SelectedItemModel>>
+        get() = selectedItemModel
+
+    fun setSelectedItem(_selectedItemModel: SelectedItemModel){
+        selectedItemModel.value=Resource.loading(null)
+        viewModelScope.launch {
+            selectedItemModel.value= Resource(
+                status = Status.SUCCESS,
+                data = _selectedItemModel,
+                message = "SUCCESS"
+            )
+
+        }
+
+    }
+
+    fun getSelectedItem() = selectedItemModel.value
 
 
 

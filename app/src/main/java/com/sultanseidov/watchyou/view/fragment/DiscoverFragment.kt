@@ -9,12 +9,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import com.sultanseidov.watchyou.R
 import com.sultanseidov.watchyou.data.entities.DiscoverType
+import com.sultanseidov.watchyou.data.entities.SelectedItemModel
 import com.sultanseidov.watchyou.data.entities.base.Status
 import com.sultanseidov.watchyou.databinding.FragmentDiscoverBinding
 import com.sultanseidov.watchyou.view.activity.UpcomingDetailsActivity
@@ -38,7 +40,7 @@ class DiscoverFragment : Fragment(R.layout.fragment_discover) {
     private var _binding: FragmentDiscoverBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel by viewModels<MovieViewModel>()
+    private val viewModel: MovieViewModel by activityViewModels()
 
 
     override fun onCreateView(
@@ -128,15 +130,13 @@ class DiscoverFragment : Fragment(R.layout.fragment_discover) {
 
             when (discoverType) {
                 DiscoverType.MOVIES ->{
-                    val bundle = Bundle()
-                    bundle.putString("movieId", onClickText.toString())
-                    Navigation.findNavController(requireView()).navigate(R.id.action_discoverFragment_to_movieDetailsFragment,bundle)
+                    viewModel.setSelectedItem(SelectedItemModel(onClickText.toString(),DiscoverType.MOVIES))
+                    Navigation.findNavController(requireView()).navigate(R.id.action_discoverFragment_to_baseDetailsFragment)
                 }
 
                 DiscoverType.SERIALS -> {
-                    val bundle = Bundle()
-                    bundle.putString("tvId", onClickText.toString())
-                    Navigation.findNavController(requireView()).navigate(R.id.action_discoverFragment_to_tvDetailsFragment,bundle)
+                    viewModel.setSelectedItem(SelectedItemModel(onClickText.toString(),DiscoverType.SERIALS))
+                    Navigation.findNavController(requireView()).navigate(R.id.action_discoverFragment_to_baseDetailsFragment)
                 }
 
                 else -> {}
